@@ -23,19 +23,6 @@ CREATE TABLE Szkolenia (
     godziny INT NOT NULL
 );
 
-CREATE TABLE Kursanci_Szkolenia (
-    id_postepu SERIAL PRIMARY KEY,
-    id_kursu INT NOT NULL,
-    id_kursanta INT NOT NULL,
-    godziny_pozostale INT NOT NULL,
-    status VARCHAR(20) NOT NULL,
-    oplacony BOOLEAN NOT NULL,
-    id_instruktora INT NOT NULL,
-    FOREIGN KEY (id_kursu) REFERENCES Szkolenia(id_kursu),
-    FOREIGN KEY (id_kursanta) REFERENCES Kursanci(id_kursanta),
-    FOREIGN KEY (id_instruktora) REFERENCES Instruktorzy(id_instruktora)
-);
-
 CREATE TABLE Pojazdy (
     id_pojazdu SERIAL PRIMARY KEY,
     nr_rejestracyjny VARCHAR(8) NOT NULL,
@@ -50,6 +37,26 @@ CREATE TABLE Plac (
     kategoria VARCHAR(5) NOT NULL,
     otwarcie TIME NOT NULL,
     zamkniecie TIME NOT NULL
+);
+
+CREATE TABLE Uprawnienia (
+    id_uprawnienia SERIAL PRIMARY KEY,
+    id_instruktora INT NOT NULL,
+    kategoria VARCHAR(5) NOT NULL,
+    FOREIGN KEY (id_instruktora) REFERENCES Instruktorzy(id_instruktora)
+);
+
+CREATE TABLE Kursanci_Szkolenia (
+    id_postepu SERIAL PRIMARY KEY,
+    id_kursu INT NOT NULL,
+    id_kursanta INT NOT NULL,
+    godziny_pozostale INT NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    oplacony BOOLEAN NOT NULL,
+    id_instruktora INT NOT NULL,
+    FOREIGN KEY (id_kursu) REFERENCES Szkolenia(id_kursu),
+    FOREIGN KEY (id_kursanta) REFERENCES Kursanci(id_kursanta),
+    FOREIGN KEY (id_instruktora) REFERENCES Instruktorzy(id_instruktora)
 );
 
 CREATE TABLE Rezerwacje_Plac (
