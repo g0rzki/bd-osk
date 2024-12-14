@@ -1,0 +1,140 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+h1 {
+    text-align: center;
+    margin: 20px 0;
+}
+
+nav {
+    background-color: #0e88d3;
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav ul li a:hover {
+    text-decoration: underline;
+}
+
+table {
+    width: 90%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background: #fff;
+}
+
+table th,
+table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+table th {
+    background-color: #0e88d3;
+    color: #fff;
+}
+
+form {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+form div {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+form label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+form input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Wyśrodkowanie przycisku */
+form .button-container {
+    text-align: center;
+}
+
+form button {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+form button:hover {
+    background-color: #555;
+}
+
+.error {
+    color: red;
+    font-weight: bold;
+    text-align: center;
+}
+
+a {
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.centered {
+    text-align: center;
+    margin: 20px auto;
+}
+
+.centered a {
+    display: inline-block;
+    padding: 10px;
+    text-decoration: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    margin: 5px;
+}
+
+.centered a:hover {
+    background-color: #0056b3;
+}
