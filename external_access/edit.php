@@ -5,33 +5,31 @@ include 'config.php';
 $table = $_GET['table'] ?? ''; 
 $id = $_GET['id'] ?? ''; 
 
-// Sprawdzenie czy parametry nie są puste
-if (empty($table) || empty($id)) {
-    die("Brak tabeli lub identyfikatora rekordu.");
+// Sprawdzenie, czy tabela jest poprawna
+if (!in_array($table, ['instruktorzy', 'kursanci', 'szkolenia', 'pojazdy', 'plac', 'uprawnienia', 'kursanci_szkolenia', 'rezerwacje_plac', 'jazdy'])) {
+    die("Nieprawidłowa tabela.");
 }
 
-// Funkcja do pobrania nazwy klucza głównego danej tabeli
-function getPrimaryKey($table) {
-    global $pdo;
-    
-    // Zapytanie, aby znaleźć klucz główny tabeli
-    $query = "
-        SELECT column_name 
-        FROM information_schema.key_column_usage 
-        WHERE table_name = :table AND constraint_name = (
-            SELECT constraint_name 
-            FROM information_schema.table_constraints 
-            WHERE table_name = :table AND constraint_type = 'PRIMARY KEY'
-        )
-    ";
-    $stmt = $pdo->prepare($query); // Przygotowanie zapytania
-    $stmt->execute(['table' => $table]); // Wykonanie zapytania z przekazaniem nazwy tabeli jako parametr
-    
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    return $result['column_name'] ?? ''; // Zwrócenie nazwy klucza głównego, jeśli istnieje
+// Mapowanie tabel i ich kluczy głównych
+$primaryKeyMap = [
+    'instruktorzy' => 'id_instruktora',
+    'kursanci' => 'id_kursanta',
+    'szkolenia' => 'id_kursu',
+    'pojazdy' => 'id_pojazdu',
+    'plac' => 'nr_toru',
+    'uprawnienia' => 'id_uprawnienia',
+    'kursanci_szkolenia' => 'id_postepu',
+    'rezerwacje_plac' => 'id_rezerwacji',
+    'jazdy' => 'id_jazdy'
+];
+
+// Sprawdzenie, czy tabela istnieje w mapowaniu
+if (!array_key_exists($table, $primaryKeyMap)) {
+    die("Nieznana tabela.");
 }
 
-$primaryKey = getPrimaryKey($table); // Pobranie klucza głównego dla tabeli
+// Pobranie nazwy klucza głównego dla danej tabeli
+$primaryKey = $primaryKeyMap[$table];
 
 // Zapytanie do pobrania danych rekordu z bazy
 $query = "SELECT * FROM $table WHERE $primaryKey = :id";
@@ -44,54 +42,79 @@ if (!$row) {
     die("Rekord nie istnieje.");
 }
 
-// Funkcja do pobrania nazw wszystkich kolumn dla tabeli
+// Funkcja wykonująca odpowiednią procedurę składowaną do wydobycia nazw kolumn z tabeli
 function getColumns($table) {
-    global $pdo;
-    
-    // Zapytanie pobierające nazwy wszystkich kolumn
-    $query = "SELECT column_name FROM information_schema.columns WHERE table_name = :table";
-    $stmt = $pdo->prepare($query);
-    $stmt->execute(['table' => $table]);
-    
-    return $stmt->fetchAll(PDO::FETCH_COLUMN); // Zwraca wszystkie nazwy kolumn
+    global $pdo; // Globalne połączenie z bazą danych
+
+    // Przygotowanie wywołania procedury
+    $stmt = $pdo->prepare("SELECT * FROM ogolne_operacje.get_table_columns(:table_name)");
+    $stmt->bindParam(':table_name', $table, PDO::PARAM_STR);
+
+    // Wykonanie procedury
+    $stmt->execute();
+
+    // Pobranie wyników w postaci tablicy
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+$columns = array_column(getColumns($table), 'column_name');
+
 // Funkcja, która sprawdza, czy kolumna może być edytowana (czy nie jest kluczem głównym)
-function isEditable($column, $primaryKey, $table) {
-    // Dla tabeli 'plac' kolumna 'nr_toru' powinna być edytowalna, mimo że jest kluczem głównym
-    if ($table === 'plac' && $column === 'nr_toru') {
-        return true; // Zezwolenie na edycję 'nr_toru' w tabeli 'plac'
-    }
+function isEditable($column, $primaryKey) {
     return $column !== $primaryKey; // Kolumna nie jest edytowalna, jeśli jest kluczem głównym
 }
 
-// Obsługa formularza, jeśli został wysłany
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Zbieranie danych z formularza
+// Procedury dla tabel
+$procedures = [
+    'instruktorzy' => 'zarzadzanie_osoby.update_instruktory',
+    'kursanci' => 'zarzadzanie_osoby.update_kursanci',
+    'szkolenia' => 'zarzadzanie_szkolenia.update_szkolenia',
+    'pojazdy' => 'zarzadzanie_pojazdy.update_pojazdy',
+    'plac' => 'zarzadzanie_plac.update_plac',
+    'uprawnienia' => 'zarzadzanie_osoby.update_uprawnienia',
+    'kursanci_szkolenia' => 'zarzadzanie_szkolenia.update_kursanci_szkolenia',
+    'rezerwacje_plac' => 'zarzadzanie_plac.update_rezerwacje_plac',
+    'jazdy' => 'zarzadzanie_jazdy.update_jazdy'
+];
+
+// Obsługa formularza
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $updatedData = [];
-    foreach (getColumns($table) as $column) {
-        if ($column !== $primaryKey || $column == 'nr_toru') { // Umożliwienie edytowania nr_toru (gdy nie jest autoinkrementowane)
-            $updatedData[$column] = $_POST[$column] ?? null; // Ustawienie wartości z formularza, lub null, jeśli pole jest puste
+
+    // Zbieranie danych z formularza, uwzględniając klucz główny
+    foreach ($columns as $column) {
+        if (isEditable($column, $primaryKey)) {
+            $updatedData[$column] = $_POST[$column] ?? null;
         }
     }
 
-    // Przygotowanie zapytania SQL do aktualizacji rekordu
-    $setFields = [];
-    foreach ($updatedData as $column => $value) {
-        $setFields[] = "$column = :$column"; // Przygotowanie części zapytania 'SET column1 = :column1'
+    // Klucz główny zawsze jest uwzględniany w zapytaniu mimo braku możliwości jego edycji
+    if (isset($procedures[$table])) {
+        $procedure = $procedures[$table];
+
+        // Przygotowanie zapytania do wykonania procedury
+        $params = $updatedData;
+        $params[$primaryKey] = $id; // Zawsze przekazujemy klucz główny do zapytania
+
+        // Przygotowanie zapytania do wykonania procedury
+        $procedureParams = [];
+        foreach ($updatedData as $key => $value) {
+            $procedureParams[":$key"] = $value;
+        }
+
+        $procedureParams[':id'] = $id; // Przekazywanie klucza głównego
+
+        // Przygotowanie zapytania z odpowiednią liczbą parametrów
+        $columnsList = implode(', ', array_map(fn($col) => ":$col", array_keys($updatedData)));
+        $stmt = $pdo->prepare("SELECT $procedure(:id::int, $columnsList)");
+
+        // Wykonanie zapytania
+        $stmt->execute($procedureParams);
+    } else {
+        die("Brak procedury do aktualizacji tej tabeli.");
     }
 
-    // Łączenie fragmentów zapytania 'SET' w jedno
-    $setString = implode(', ', $setFields);
-    // Zapytanie SQL do aktualizacji rekordu w tabeli
-    $updateQuery = "UPDATE $table SET $setString WHERE $primaryKey = :id";
-
-    // Przygotowanie i wykonanie zapytania
-    $stmt = $pdo->prepare($updateQuery);
-    $updatedData['id'] = $id; // Dodanie ID do danych do wykonania
-    $stmt->execute($updatedData);
-
-    // Po zakończeniu edycji, przekierowanie do widoku tabeli
+    // Po zakończeniu aktualizacji, przekierowanie do tabeli
     header("Location: table.php?table=$table");
     exit;
 }
@@ -107,20 +130,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body>
     <h1>Edytuj rekord w tabeli <?php echo htmlspecialchars($table); ?></h1>
-
-    <!-- Formularz edycji rekordu -->
+     <!-- Formularz do edycji rekordu -->
     <form action="edit.php?table=<?php echo $table; ?>&id=<?php echo $id; ?>" method="POST">
-        <?php foreach (getColumns($table) as $column): ?>
-            <?php if (isEditable($column, $primaryKey, $table)): ?>
-                <div>
-                    <label for="<?php echo $column; ?>"><?php echo $column; ?>:</label>
-                    <input type="text" id="<?php echo $column; ?>" name="<?php echo $column; ?>" value="<?php echo htmlspecialchars($row[$column] ?? '', ENT_QUOTES); ?>">
-                </div>
-            <?php endif; ?>
+        <?php foreach ($columns as $column): ?>
+            <div>
+                <label for="<?php echo $column; ?>"><?php echo $column; ?>:</label>
+                <input type="text" id="<?php echo $column; ?>" name="<?php echo $column; ?>" 
+                    value="<?php echo htmlspecialchars($row[$column] ?? '', ENT_QUOTES); ?>" 
+                    <?php echo isEditable($column, $primaryKey) ? '' : 'disabled'; ?>>
+            </div>
         <?php endforeach; ?>
 
-        <!-- Przycisk zatwierdzający edycję -->
-        <button type="submit">Edytuj rekord</button>
+        <!-- Przycisk do wysłania formularza -->
+        <button type="submit">Zapisz zmiany</button>
     </form>
 
     <!-- Link powrotu do tabeli -->

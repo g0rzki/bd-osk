@@ -21,15 +21,15 @@ function deleteRecord($table, $id) {
 
     // Mapowanie tabel na procedury składowane w bazie danych
     $procedures = [
-        'plac' => 'delete_from_plac',
-        'instruktorzy' => 'delete_from_instruktorzy',
-        'kursanci' => 'delete_from_kursanci',
-        'szkolenia' => 'delete_from_szkolenia',
-        'pojazdy' => 'delete_from_pojazdy',
-        'uprawnienia' => 'delete_from_uprawnienia',
-        'kursanci_szkolenia' => 'delete_from_kursanci_szkolenia',
-        'rezerwacje_plac' => 'delete_from_rezerwacje_plac',
-        'jazdy' => 'delete_from_jazdy'
+        'instruktorzy' => 'zarzadzanie_osoby.delete_from_instruktorzy',
+        'kursanci' => 'zarzadzanie_osoby.delete_from_kursanci',
+        'szkolenia' => 'zarzadzanie_szkolenia.delete_from_szkolenia',
+        'pojazdy' => 'zarzadzanie_pojazdy.delete_from_pojazdy',
+        'plac' => 'zarzadzanie_plac.delete_from_plac',
+        'uprawnienia' => 'zarzadzanie_osoby.delete_from_uprawnienia',
+        'kursanci_szkolenia' => 'zarzadzanie_szkolenia.delete_from_kursanci_szkolenia',
+        'rezerwacje_plac' => 'zarzadzanie_plac.delete_from_rezerwacje_plac',
+        'jazdy' => 'zarzadzanie_jazdy.delete_from_jazdy'
     ];
 
     // Sprawdzenie, czy procedura dla danej tabeli istnieje

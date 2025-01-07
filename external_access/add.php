@@ -9,17 +9,19 @@ if (!in_array($table, ['instruktorzy', 'kursanci', 'szkolenia', 'pojazdy', 'plac
     die("Nieprawidłowa tabela.");
 }
 
-// Funkcja wykonująca odpowiednią procedurę składowaną do dodawania rekordu z wybranej tabeli
+// Funkcja wykonująca odpowiednią procedurę składowaną do wydobycia nazw kolumn z tabeli
 function getColumns($table) {
     global $pdo; // Globalne połączenie z bazą danych
 
-    // Pobranie informacji o kolumnach i kluczach głównych
-    $query = "
-        SELECT column_name, is_nullable, column_default LIKE 'nextval%' AS is_serial FROM information_schema.columns WHERE table_name = :table
-    ";
-    $stmt = $pdo->prepare($query); // Przygotowanie zapytania
-    $stmt->execute(['table' => $table]); // Wykonanie zapytania z przekazaniem nazwy tabeli jako parametr
-    return $stmt->fetchAll(PDO::FETCH_ASSOC); // Zwrócenie wszystkich kolumn w postaci tablicy
+    // Przygotowanie wywołania procedury
+    $stmt = $pdo->prepare("SELECT * FROM ogolne_operacje.get_table_columns(:table_name)");
+    $stmt->bindParam(':table_name', $table, PDO::PARAM_STR);
+
+    // Wykonanie procedury
+    $stmt->execute();
+
+    // Pobranie wyników w postaci tablicy
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 // Pobranie kolumny danej tabeli
@@ -54,15 +56,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Mapowanie tabel na procedury składowane w bazie danych
     $procedures = [
-        'instruktorzy' => 'insert_into_instruktorzy',
-        'kursanci' => 'insert_into_kursanci',
-        'szkolenia' => 'insert_into_szkolenia',
-        'pojazdy' => 'insert_into_pojazdy',
-        'plac' => 'insert_into_plac',
-        'uprawnienia' => 'insert_into_uprawnienia',
-        'kursanci_szkolenia' => 'insert_into_kursanci_szkolenia',
-        'rezerwacje_plac' => 'insert_into_rezerwacje_plac',
-        'jazdy' => 'insert_into_jazdy'
+        'instruktorzy' => 'zarzadzanie_osoby.insert_into_instruktorzy',
+        'kursanci' => 'zarzadzanie_osoby.insert_into_kursanci',
+        'szkolenia' => 'zarzadzanie_szkolenia.insert_into_szkolenia',
+        'pojazdy' => 'zarzadzanie_pojazdy.insert_into_pojazdy',
+        'plac' => 'zarzadzanie_plac.insert_into_plac',
+        'uprawnienia' => 'zarzadzanie_osoby.insert_into_uprawnienia',
+        'kursanci_szkolenia' => 'zarzadzanie_szkolenia.insert_into_kursanci_szkolenia',
+        'rezerwacje_plac' => 'zarzadzanie_plac.insert_into_rezerwacje_plac',
+        'jazdy' => 'zarzadzanie_jazdy.insert_into_jazdy'
     ];
 
     // Sprawdzenie, czy dla danej tabeli istnieje procedura do dodania rekordu

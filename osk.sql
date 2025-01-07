@@ -1,16 +1,15 @@
-CREATE SCHEMA instruktor_management;
-CREATE SCHEMA kursant_management;
-CREATE SCHEMA szkolenie_management;
-CREATE SCHEMA pojazd_management;
-CREATE SCHEMA plac_management;
-CREATE SCHEMA uprawnienie_management;
-CREATE SCHEMA jazda_management;
-CREATE SCHEMA kursantSzkolenie_management;
+-- Deklaracja pakietów
+CREATE SCHEMA ogolne_operacje;
+CREATE SCHEMA zarzadzanie_osoby;
+CREATE SCHEMA zarzadzanie_szkolenia;
+CREATE SCHEMA zarzadzanie_pojazdy;
+CREATE SCHEMA zarzadzanie_plac;
+CREATE SCHEMA zarzadzanie_jazdy;
 
 
 
-
-CREATE TABLE instruktor_management.instruktorzy (
+-- Deklaracja tabeli instruktorzy
+CREATE TABLE instruktorzy (
     id_instruktora SERIAL PRIMARY KEY,
     imie VARCHAR(20) NOT NULL,
     nazwisko VARCHAR(40) NOT NULL,
@@ -20,7 +19,8 @@ CREATE TABLE instruktor_management.instruktorzy (
 
 
 
-CREATE TABLE kursant_management.kursanci (
+-- Deklaracja tabeli kursanci
+CREATE TABLE kursanci (
     id_kursanta SERIAL PRIMARY KEY,
     imie VARCHAR(20) NOT NULL,
     nazwisko VARCHAR(40) NOT NULL,
@@ -31,7 +31,8 @@ CREATE TABLE kursant_management.kursanci (
 
 
 
-CREATE TABLE szkolenie_management.szkolenia (
+-- Deklaracja tabeli szkolenia
+CREATE TABLE szkolenia (
     id_kursu SERIAL PRIMARY KEY,
     nazwa VARCHAR(40) NOT NULL,
     cena DECIMAL NOT NULL,
@@ -40,7 +41,8 @@ CREATE TABLE szkolenie_management.szkolenia (
 
 
 
-CREATE TABLE pojazd_management.pojazdy (
+-- Deklaracja tabeli pojazdy
+CREATE TABLE pojazdy (
     id_pojazdu SERIAL PRIMARY KEY,
     nr_rejestracyjny VARCHAR(8) NOT NULL,
     kategoria VARCHAR(5) NOT NULL,
@@ -51,7 +53,8 @@ CREATE TABLE pojazd_management.pojazdy (
 
 
 
-CREATE TABLE plac_management.plac (
+-- Deklaracja tabeli plac
+CREATE TABLE plac (
     nr_toru INT PRIMARY KEY,
     kategoria VARCHAR(5) NOT NULL,
     otwarcie TIME NOT NULL,
@@ -60,16 +63,18 @@ CREATE TABLE plac_management.plac (
 
 
 
-CREATE TABLE uprawnienie_management.uprawnienia (
+-- Deklaracja tabeli uprawnienia
+CREATE TABLE uprawnienia (
     id_uprawnienia SERIAL PRIMARY KEY,
     id_instruktora INT NOT NULL,
     kategoria VARCHAR(5) NOT NULL,
-    FOREIGN KEY (id_instruktora) REFERENCES instruktor_management.instruktorzy(id_instruktora) ON DELETE CASCADE
+    FOREIGN KEY (id_instruktora) REFERENCES instruktorzy(id_instruktora) ON DELETE CASCADE
 );
 
 
 
-CREATE TABLE kursantSzkolenie_management.kursanci_szkolenia (
+-- Deklaracja tabeli kursanci_szkolenia
+CREATE TABLE kursanci_szkolenia (
     id_postepu SERIAL PRIMARY KEY,
     id_kursu INT NOT NULL,
     id_kursanta INT NOT NULL,
@@ -77,25 +82,27 @@ CREATE TABLE kursantSzkolenie_management.kursanci_szkolenia (
     godziny_pozostale INT NOT NULL,
     status VARCHAR(20) NOT NULL,
     oplacony BOOLEAN NOT NULL,
-    FOREIGN KEY (id_kursu) REFERENCES szkolenie_management.szkolenia(id_kursu) ON DELETE CASCADE,
-    FOREIGN KEY (id_kursanta) REFERENCES kursant_management.kursanci(id_kursanta) ON DELETE CASCADE,
-    FOREIGN KEY (id_instruktora) REFERENCES instruktor_management.instruktorzy(id_instruktora) ON DELETE CASCADE
+    FOREIGN KEY (id_kursu) REFERENCES szkolenia(id_kursu) ON DELETE CASCADE,
+    FOREIGN KEY (id_kursanta) REFERENCES kursanci(id_kursanta) ON DELETE CASCADE,
+    FOREIGN KEY (id_instruktora) REFERENCES instruktorzy(id_instruktora) ON DELETE CASCADE
 );
 
 
 
-CREATE TABLE plac_management.rezerwacje_plac (
+-- Deklaracja tabeli rezerwacje_plac
+CREATE TABLE rezerwacje_plac (
     id_rezerwacji SERIAL PRIMARY KEY,
     nr_toru INT NOT NULL,
     data_rezerwacji DATE NOT NULL,
     godzina_start TIME NOT NULL,
     godzina_koniec TIME NOT NULL,
-    FOREIGN KEY (nr_toru) REFERENCES plac_management.plac(nr_toru) ON DELETE CASCADE
+    FOREIGN KEY (nr_toru) REFERENCES plac(nr_toru) ON DELETE CASCADE
 );
 
 
 
-CREATE TABLE jazda_management.jazdy (
+-- Deklaracja tabeli jazdy
+CREATE TABLE jazdy (
     id_jazdy SERIAL PRIMARY KEY,
     id_instruktora INT NOT NULL,
     id_pojazdu INT NOT NULL,
@@ -103,15 +110,16 @@ CREATE TABLE jazda_management.jazdy (
     id_rezerwacji INT NULL,
     godzina_rozpoczecia TIMESTAMP NOT NULL,
     godzina_zakonczenia TIMESTAMP NOT NULL,
-    FOREIGN KEY (id_instruktora) REFERENCES instruktor_management.instruktorzy(id_instruktora) ON DELETE CASCADE,
-    FOREIGN KEY (id_pojazdu) REFERENCES pojazd_management.pojazdy(id_pojazdu) ON DELETE CASCADE,
-    FOREIGN KEY (id_kursanta) REFERENCES kursant_management.kursanci(id_kursanta) ON DELETE CASCADE,
-    FOREIGN KEY (id_rezerwacji) REFERENCES plac_management.rezerwacje_Plac(id_rezerwacji) ON DELETE CASCADE
+    FOREIGN KEY (id_instruktora) REFERENCES instruktorzy(id_instruktora) ON DELETE CASCADE,
+    FOREIGN KEY (id_pojazdu) REFERENCES pojazdy(id_pojazdu) ON DELETE CASCADE,
+    FOREIGN KEY (id_kursanta) REFERENCES kursanci(id_kursanta) ON DELETE CASCADE,
+    FOREIGN KEY (id_rezerwacji) REFERENCES rezerwacje_Plac(id_rezerwacji) ON DELETE CASCADE
 );
 
 
 
-INSERT INTO instruktor_management.instruktorzy (imie, nazwisko, telefon, email) VALUES
+-- Wprowadzenie danych do tabeli instruktorzy
+INSERT INTO instruktorzy (imie, nazwisko, telefon, email) VALUES
 ('Jan', 'Kowalski', '500123456', 'jan.kowalski@example.com'),
 ('Katarzyna', 'Nowak', '500234567', 'katarzyna.nowak@example.com'),
 ('Piotr', 'Wiśniewski', '500345678', 'piotr.wisniewski@example.com'),
@@ -125,7 +133,8 @@ INSERT INTO instruktor_management.instruktorzy (imie, nazwisko, telefon, email) 
 
 
 
-INSERT INTO uprawnienie_management.uprawnienia (id_instruktora, kategoria) VALUES 
+-- Wprowadzenie danych do tabeli uprawnienia
+INSERT INTO uprawnienia (id_instruktora, kategoria) VALUES 
 (1, 'B'),
 (2, 'A'),
 (2, 'B'),
@@ -143,16 +152,19 @@ INSERT INTO uprawnienie_management.uprawnienia (id_instruktora, kategoria) VALUE
 
 
 
-INSERT INTO plac_management.plac (nr_toru, kategoria, otwarcie, zamkniecie) VALUES
+-- Wprowadzenie danych do tabeli plac
+INSERT INTO plac (nr_toru, kategoria, otwarcie, zamkniecie) VALUES
 (1, 'B', '07:00', '17:00'),
 (2, 'B', '08:00', '18:00'),
 (3, 'B', '09:00', '19:00'),
 (4, 'A', '09:00', '16:00'),
-(5, 'C', '08:00', '15:00');
+(5, 'C', '08:00', '15:00'),
+(6, 'D', '10:00', '17:00');
 
 
 
-INSERT INTO szkolenie_management.szkolenia (nazwa, cena, godziny) VALUES
+-- Wprowadzenie danych do tabeli szkolenia
+INSERT INTO szkolenia (nazwa, cena, godziny) VALUES
 ('B', 2000.00, 30),
 ('A', 1700.00, 20),
 ('D', 3000.00, 40),
@@ -160,7 +172,8 @@ INSERT INTO szkolenie_management.szkolenia (nazwa, cena, godziny) VALUES
 
 
 
-INSERT INTO pojazd_management.pojazdy (nr_rejestracyjny, kategoria, rok_produkcji, marka, model) VALUES
+-- Wprowadzenie danych do tabeli pojazdy
+INSERT INTO pojazdy (nr_rejestracyjny, kategoria, rok_produkcji, marka, model) VALUES
 ('RZC1234', 'B', '2020', 'Toyota', 'Yaris'),
 ('RZZ5678', 'B', '2021', 'Toyota', 'Yaris'),
 ('KRL4321', 'B', '2019', 'Toyota', 'Yaris'),
@@ -173,7 +186,8 @@ INSERT INTO pojazd_management.pojazdy (nr_rejestracyjny, kategoria, rok_produkcj
 
 
 
-INSERT INTO kursant_management.kursanci (imie, nazwisko, data_urodzenia, telefon, email) VALUES
+-- Wprowadzenie danych do tabeli kursanci
+INSERT INTO kursanci (imie, nazwisko, data_urodzenia, telefon, email) VALUES
 ('Adam', 'Kowalski', '1995-03-12', '500123456', 'adam.kowalski1@example.com'),
 ('Ewa', 'Nowak', '1998-05-18', '500234567', 'ewa.nowak2@example.com'),
 ('Michał', 'Wiśniewski', '1993-09-10', '500345678', 'michal.wisniewski3@example.com'),
@@ -260,7 +274,8 @@ INSERT INTO kursant_management.kursanci (imie, nazwisko, data_urodzenia, telefon
 
 
 
-INSERT INTO kursantSzkolenie_management.kursanci_szkolenia (id_kursu, id_kursanta, godziny_pozostale, status, oplacony, id_instruktora) VALUES
+-- Wprowadzenie danych do tabeli kursanci_szkolenia
+INSERT INTO kursanci_szkolenia (id_kursu, id_kursanta, godziny_pozostale, status, oplacony, id_instruktora) VALUES
 (1, 1, 30, 'aktywny', TRUE, 1),
 (1, 2, 20, 'aktywny', FALSE, 2),
 (4, 3, 3, 'aktywny', TRUE, 3),
@@ -347,7 +362,8 @@ INSERT INTO kursantSzkolenie_management.kursanci_szkolenia (id_kursu, id_kursant
 
 
 
-INSERT INTO plac_management.rezerwacje_plac (nr_toru, data_rezerwacji, godzina_start, godzina_koniec) VALUES
+-- Wprowadzenie danych do tabeli rezerwacje_plac
+INSERT INTO rezerwacje_plac (nr_toru, data_rezerwacji, godzina_start, godzina_koniec) VALUES
 (1, '2024-12-02', '08:00:00', '09:00:00'),
 (4, '2024-12-02', '10:00:00', '11:30:00'),
 (5, '2024-12-02', '12:00:00', '14:00:00'),
@@ -431,7 +447,8 @@ INSERT INTO plac_management.rezerwacje_plac (nr_toru, data_rezerwacji, godzina_s
 
 
 
-INSERT INTO jazda_management.jazdy (id_instruktora, id_pojazdu, id_kursanta, id_rezerwacji, godzina_rozpoczecia, godzina_zakonczenia) VALUES
+-- Wprowadzenie danych do tabeli jazdy
+INSERT INTO jazdy (id_instruktora, id_pojazdu, id_kursanta, id_rezerwacji, godzina_rozpoczecia, godzina_zakonczenia) VALUES
 (1, 1, 1, 1, '2024-12-02 08:00:00', '2024-12-02 09:00:00'),
 (2, 5, 2, 2, '2024-12-02 10:00:00', '2024-12-02 11:30:00'),
 (3, 8, 3, 3, '2024-12-02 12:00:00', '2024-12-02 14:00:00'),
@@ -551,19 +568,46 @@ INSERT INTO jazda_management.jazdy (id_instruktora, id_pojazdu, id_kursanta, id_
 
 
 
-CREATE OR REPLACE FUNCTION instruktor_management.insert_into_instruktorzy(IN p_imie VARCHAR(20), IN p_nazwisko VARCHAR(40), IN p_telefon VARCHAR(9), IN p_email VARCHAR(50))
+-- Funkcja do wydobycia kolumn z tabeli przy dodawaniu/edycji rekordów
+CREATE OR REPLACE FUNCTION ogolne_operacje.get_table_columns(table_name text)
+RETURNS TABLE (
+    column_name text,
+    is_nullable text,
+    is_serial boolean
+) AS $$
+BEGIN
+    -- Zwraca zapytanie, które wydobywa informacje o kolumnach tabeli
+    RETURN QUERY
+    SELECT 
+        -- Pobranie nazwy kolumny
+        c.column_name::text, 
+        -- Pobranie informacji, czy kolumna może być NULL
+        c.is_nullable::text, 
+        -- Sprawdzenie, czy kolumna ma domyślną wartość 'nextval' (czy jest typu serial)
+        c.column_default LIKE 'nextval%' AS is_serial
+    FROM information_schema.columns c
+    -- Parametr wejściowy $1 odnosi się do nazwy tabeli, której kolumny mają zostać pobrane
+    WHERE c.table_name = $1;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+-- Funkcja do tworzenia nowych rekordów w tabeli instruktorzy
+CREATE OR REPLACE FUNCTION zarzadzanie_osoby.insert_into_instruktorzy(IN p_imie VARCHAR(20), IN p_nazwisko VARCHAR(40), IN p_telefon VARCHAR(9), IN p_email VARCHAR(50))
 RETURNS VOID AS $$
 BEGIN
-    INSERT INTO instruktor_management.instruktorzy (imie, nazwisko, telefon, email) VALUES (p_imie, p_nazwisko, p_telefon, p_email);
+    INSERT INTO instruktorzy (imie, nazwisko, telefon, email) VALUES (p_imie, p_nazwisko, p_telefon, p_email);
 END;
 $$ LANGUAGE plpgsql;
     
 
 
-CREATE OR REPLACE FUNCTION instruktor_management.update_instruktorzy(IN p_id_instruktora INT, IN p_imie VARCHAR(20), IN p_nazwisko VARCHAR(40), IN p_telefon VARCHAR(9), IN p_email VARCHAR(50))
+-- Funkcja do edycji istniejących rekordów w tabeli instruktorzy
+CREATE OR REPLACE FUNCTION zarzadzanie_osoby.update_instruktorzy(IN p_id_instruktora INT, IN p_imie VARCHAR(20), IN p_nazwisko VARCHAR(40), IN p_telefon VARCHAR(9), IN p_email VARCHAR(50))
 RETURNS VOID AS $$
 BEGIN
-    UPDATE instruktor_management.instruktorzy SET imie = p_imie, nazwisko = p_nazwisko, telefon = p_telefon, email = p_email WHERE id_instruktora = p_id_instruktora;
+    UPDATE instruktorzy SET imie = p_imie, nazwisko = p_nazwisko, telefon = p_telefon, email = p_email WHERE id_instruktora = p_id_instruktora;
     IF NOT FOUND THEN
 	RAISE EXCEPTION 'Rekord o id_instruktora = % nie istnieje', p_id_instruktora;
     END IF;
@@ -572,10 +616,11 @@ $$ LANGUAGE plpgsql;
     
 
 
-CREATE OR REPLACE FUNCTION instruktor_management.delete_from_instruktorzy(IN p_id_instruktora INT)
+-- Funkcja do usuwania rekordów w tabeli instruktorzy
+CREATE OR REPLACE FUNCTION zarzadzanie_osoby.delete_from_instruktorzy(IN p_id_instruktora INT)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM instruktor_management.instruktorzy WHERE id_instruktora = p_id_instruktora;
+    DELETE FROM instruktorzy WHERE id_instruktora = p_id_instruktora;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Rekord o id_instruktora = % nie istnieje', p_id_instruktora;
     END IF;
@@ -584,19 +629,21 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION kursant_management.insert_into_kursanci(IN p_imie VARCHAR(20), IN p_nazwisko VARCHAR(40), IN p_data_urodzenia DATE, IN p_telefon VARCHAR(9), IN p_email VARCHAR(50))
+-- Funkcja do tworzenia nowych rekordów w tabeli kursanci
+CREATE OR REPLACE FUNCTION zarzadzanie_osoby.insert_into_kursanci(IN p_imie VARCHAR(20), IN p_nazwisko VARCHAR(40), IN p_data_urodzenia DATE, IN p_telefon VARCHAR(9), IN p_email VARCHAR(50))
 RETURNS VOID AS $$
 BEGIN
-    INSERT INTO kursant_management.kursanci (imie, nazwisko, data_urodzenia, telefon, email) VALUES (p_imie, p_nazwisko, p_data_urodzenia, p_telefon, p_email);
+    INSERT INTO kursanci (imie, nazwisko, data_urodzenia, telefon, email) VALUES (p_imie, p_nazwisko, p_data_urodzenia, p_telefon, p_email);
 END;
 $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION kursant_management.update_kursanci(IN p_id_kursanta INT, IN p_imie VARCHAR(20), IN p_nazwisko VARCHAR(40), IN p_data_urodzenia DATE, IN p_telefon VARCHAR(9), IN p_email VARCHAR(50))
+-- Funkcja do edycji istniejących rekordów w tabeli kursanci
+CREATE OR REPLACE FUNCTION zarzadzanie_osoby.update_kursanci(IN p_id_kursanta INT, IN p_imie VARCHAR(20), IN p_nazwisko VARCHAR(40), IN p_data_urodzenia DATE, IN p_telefon VARCHAR(9), IN p_email VARCHAR(50))
 RETURNS VOID AS $$
 BEGIN
-    UPDATE kursant_management.kursanci SET imie = p_imie, nazwisko = p_nazwisko, data_urodzenia = p_data_urodzenia, telefon = p_telefon, email = p_email WHERE id_kursanta = p_id_kursanta;
+    UPDATE kursanci SET imie = p_imie, nazwisko = p_nazwisko, data_urodzenia = p_data_urodzenia, telefon = p_telefon, email = p_email WHERE id_kursanta = p_id_kursanta;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Kursant o id_kursanta = % nie istnieje', p_id_kursanta;
     END IF;
@@ -605,10 +652,11 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION kursant_management.delete_from_kursanci(IN p_id_kursanta INT)
+-- Funkcja do usuwania rekordów w tabeli kursanci
+CREATE OR REPLACE FUNCTION zarzadzanie_osoby.delete_from_kursanci(IN p_id_kursanta INT)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM kursant_management.kursanci WHERE id_kursanta = p_id_kursanta;
+    DELETE FROM kursanci WHERE id_kursanta = p_id_kursanta;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Kursant o id_kursanta = % nie istnieje', p_id_kursanta;
     END IF;
@@ -617,19 +665,21 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION szkolenie_management.insert_into_szkolenia(IN p_nazwa VARCHAR(40), IN p_cena DECIMAL, IN p_godziny INT)
+-- Funkcja do tworzenia nowych rekordów w tabeli szkolenia
+CREATE OR REPLACE FUNCTION zarzadzanie_szkolenia.insert_into_szkolenia(IN p_nazwa VARCHAR(40), IN p_cena DECIMAL, IN p_godziny INT)
 RETURNS VOID AS $$
 BEGIN
-    INSERT INTO szkolenie_management.szkolenia (nazwa, cena, godziny) VALUES (p_nazwa, p_cena, p_godziny);
+    INSERT INTO szkolenia (nazwa, cena, godziny) VALUES (p_nazwa, p_cena, p_godziny);
 END;
 $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION szkolenie_management.update_szkolenia(IN p_id_kursu INT, IN p_nazwa VARCHAR(40), IN p_cena DECIMAL, IN p_godziny INT)
+-- Funkcja do edycji istniejących rekordów w tabeli szkolenia
+CREATE OR REPLACE FUNCTION zarzadzanie_szkolenia.update_szkolenia(IN p_id_kursu INT, IN p_nazwa VARCHAR(40), IN p_cena DECIMAL, IN p_godziny INT)
 RETURNS VOID AS $$
 BEGIN
-    UPDATE szkolenie_management.szkolenia SET nazwa = p_nazwa, cena = p_cena, godziny = p_godziny WHERE id_kursu = p_id_kursu;
+    UPDATE szkolenia SET nazwa = p_nazwa, cena = p_cena, godziny = p_godziny WHERE id_kursu = p_id_kursu;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Szkolenie o id_kursu = % nie istnieje', p_id_kursu;
     END IF;
@@ -638,10 +688,11 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION szkolenie_management.delete_from_szkolenia(IN p_id_kursu INT)
+-- Funkcja do usuwania rekordów w tabeli szkolenia
+CREATE OR REPLACE FUNCTION zarzadzanie_szkolenia.delete_from_szkolenia(IN p_id_kursu INT)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM szkolenie_management.szkolenia WHERE id_kursu = p_id_kursu;
+    DELETE FROM szkolenia WHERE id_kursu = p_id_kursu;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Szkolenie o id_kursu = % nie istnieje', p_id_kursu;
     END IF;
@@ -650,19 +701,21 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION pojazd_management.insert_into_pojazdy(IN p_nr_rejestracyjny VARCHAR(8), IN p_kategoria VARCHAR(5), IN p_rok_produkcji VARCHAR(4), IN p_marka VARCHAR(20), IN p_model VARCHAR(40))
+-- Funkcja do tworzenia nowych rekordów w tabeli pojazdy
+CREATE OR REPLACE FUNCTION zarzadzanie_pojazdy.insert_into_pojazdy(IN p_nr_rejestracyjny VARCHAR(8), IN p_kategoria VARCHAR(5), IN p_rok_produkcji VARCHAR(4), IN p_marka VARCHAR(20), IN p_model VARCHAR(40))
 RETURNS VOID AS $$
 BEGIN
-    INSERT INTO pojazd_management.pojazdy (nr_rejestracyjny, kategoria, rok_produkcji, marka, model) VALUES (p_nr_rejestracyjny, p_kategoria, p_rok_produkcji, p_marka, p_model);
+    INSERT INTO pojazdy (nr_rejestracyjny, kategoria, rok_produkcji, marka, model) VALUES (p_nr_rejestracyjny, p_kategoria, p_rok_produkcji, p_marka, p_model);
 END;
 $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION pojazd_management.update_pojazdy(IN p_id_pojazdu INT, IN p_nr_rejestracyjny VARCHAR(8), IN p_kategoria VARCHAR(5), IN p_rok_produkcji VARCHAR(4), IN p_marka VARCHAR(20), IN p_model VARCHAR(40))
+-- Funkcja do edycji istniejących rekordów w tabeli pojazdy
+CREATE OR REPLACE FUNCTION zarzadzanie_pojazdy.update_pojazdy(IN p_id_pojazdu INT, IN p_nr_rejestracyjny VARCHAR(8), IN p_kategoria VARCHAR(5), IN p_rok_produkcji VARCHAR(4), IN p_marka VARCHAR(20), IN p_model VARCHAR(40))
 RETURNS VOID AS $$
 BEGIN
-    UPDATE pojazd_management.pojazdy SET nr_rejestracyjny = p_nr_rejestracyjny, kategoria = p_kategoria, 
+    UPDATE pojazdy SET nr_rejestracyjny = p_nr_rejestracyjny, kategoria = p_kategoria, 
         rok_produkcji = p_rok_produkcji, marka = p_marka, model = p_model WHERE id_pojazdu = p_id_pojazdu;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Pojazd o id_pojazdu = % nie istnieje', p_id_pojazdu;
@@ -672,10 +725,11 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION pojazd_management.delete_from_pojazdy(IN p_id_pojazdu INT)
+-- Funkcja do usuwania rekordów w tabeli pojazdy
+CREATE OR REPLACE FUNCTION zarzadzanie_pojazdy.delete_from_pojazdy(IN p_id_pojazdu INT)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM pojazd_management.pojazdy WHERE id_pojazdu = p_id_pojazdu;
+    DELETE FROM pojazdy WHERE id_pojazdu = p_id_pojazdu;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Pojazd o id_pojazdu = % nie istnieje', p_id_pojazdu;
     END IF;
@@ -684,19 +738,21 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION plac_management.insert_into_plac(IN p_nr_toru INT, IN p_kategoria VARCHAR(5), IN p_otwarcie TIME, IN p_zamkniecie TIME)
+-- Funkcja do tworzenia nowych rekordów w tabeli plac
+CREATE OR REPLACE FUNCTION zarzadzanie_plac.insert_into_plac(IN p_nr_toru INT, IN p_kategoria VARCHAR(5), IN p_otwarcie TIME, IN p_zamkniecie TIME)
 RETURNS VOID AS $$
 BEGIN
-    INSERT INTO plac_management.plac (nr_toru, kategoria, otwarcie, zamkniecie) VALUES (p_nr_toru, p_kategoria, p_otwarcie, p_zamkniecie);
+    INSERT INTO plac (nr_toru, kategoria, otwarcie, zamkniecie) VALUES (p_nr_toru, p_kategoria, p_otwarcie, p_zamkniecie);
 END;
 $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION plac_management.update_plac(IN p_nr_toru INT, IN p_kategoria VARCHAR(5), IN p_otwarcie TIME, IN p_zamkniecie TIME)
+-- Funkcja do edycji istniejących rekordów w tabeli plac
+CREATE OR REPLACE FUNCTION zarzadzanie_plac.update_plac(IN p_nr_toru INT, IN p_kategoria VARCHAR(5), IN p_otwarcie TIME, IN p_zamkniecie TIME)
 RETURNS VOID AS $$
 BEGIN
-    UPDATE plac_management.plac SET kategoria = p_kategoria, otwarcie = p_otwarcie, zamkniecie = p_zamkniecie WHERE nr_toru = p_nr_toru;
+    UPDATE plac SET kategoria = p_kategoria, otwarcie = p_otwarcie, zamkniecie = p_zamkniecie WHERE nr_toru = p_nr_toru;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Tor o nr_toru = % nie istnieje', p_nr_toru;
     END IF;
@@ -705,10 +761,11 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION plac_management.delete_from_plac(IN p_nr_toru INT)
+-- Funkcja do usuwania rekordów w tabeli plac
+CREATE OR REPLACE FUNCTION zarzadzanie_plac.delete_from_plac(IN p_nr_toru INT)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM plac_management.plac WHERE nr_toru = p_nr_toru;
+    DELETE FROM plac WHERE nr_toru = p_nr_toru;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Tor o nr_toru = % nie istnieje', p_nr_toru;
     END IF;
@@ -717,19 +774,21 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION uprawnienie_management.insert_into_uprawnienia(IN p_id_instruktora INT, IN p_kategoria VARCHAR(5))
+-- Funkcja do tworzenia nowych rekordów w tabeli uprawnienia
+CREATE OR REPLACE FUNCTION zarzadzanie_osoby.insert_into_uprawnienia(IN p_id_instruktora INT, IN p_kategoria VARCHAR(5))
 RETURNS VOID AS $$
 BEGIN
-    INSERT INTO uprawnienie_management.uprawnienia (id_instruktora, kategoria) VALUES (p_id_instruktora, p_kategoria);
+    INSERT INTO uprawnienia (id_instruktora, kategoria) VALUES (p_id_instruktora, p_kategoria);
 END;
 $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION uprawnienie_management.update_uprawnienia(IN p_id_uprawnienia INT, IN p_id_instruktora INT, IN p_kategoria VARCHAR(5))
+-- Funkcja do edycji istniejących rekordów w tabeli uprawnienia
+CREATE OR REPLACE FUNCTION zarzadzanie_osoby.update_uprawnienia(IN p_id_uprawnienia INT, IN p_id_instruktora INT, IN p_kategoria VARCHAR(5))
 RETURNS VOID AS $$
 BEGIN
-    UPDATE uprawnienie_management.uprawnienia SET id_instruktora = p_id_instruktora, kategoria = p_kategoria WHERE id_uprawnienia = p_id_uprawnienia;
+    UPDATE uprawnienia SET id_instruktora = p_id_instruktora, kategoria = p_kategoria WHERE id_uprawnienia = p_id_uprawnienia;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Uprawnienie o id_uprawnienia = % nie istnieje', p_id_uprawnienia;
     END IF;
@@ -738,10 +797,11 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION uprawnienie_management.delete_from_uprawnienia(IN p_id_uprawnienia INT)
+-- Funkcja do usuwania rekordów w tabeli uprawnienia
+CREATE OR REPLACE FUNCTION zarzadzanie_osoby.delete_from_uprawnienia(IN p_id_uprawnienia INT)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM uprawnienie_management.uprawnienia WHERE id_uprawnienia = p_id_uprawnienia;
+    DELETE FROM uprawnienia WHERE id_uprawnienia = p_id_uprawnienia;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Uprawnienie o id_uprawnienia = % nie istnieje', p_id_uprawnienia;
     END IF;
@@ -750,19 +810,21 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION kursantSzkolenie_management.insert_into_kursanci_szkolenia(IN p_id_kursu INT, IN p_id_kursanta INT, IN p_id_instruktora INT, IN p_godziny_pozostale INT, IN p_status VARCHAR(20), IN p_oplacony BOOLEAN)
+-- Funkcja do tworzenia nowych rekordów w tabeli kursanci_szkolenia
+CREATE OR REPLACE FUNCTION zarzadzanie_szkolenia.insert_into_kursanci_szkolenia(IN p_id_kursu INT, IN p_id_kursanta INT, IN p_id_instruktora INT, IN p_godziny_pozostale INT, IN p_status VARCHAR(20), IN p_oplacony BOOLEAN)
 RETURNS VOID AS $$
 BEGIN
-    INSERT INTO kursantSzkolenia_management.kursanci_szkolenia (id_kursu, id_kursanta, id_instruktora, godziny_pozostale, status, oplacony) VALUES (p_id_kursu, p_id_kursanta, p_id_instruktora, p_godziny_pozostale, p_status, p_oplacony);
+    INSERT INTO kursanci_szkolenia (id_kursu, id_kursanta, id_instruktora, godziny_pozostale, status, oplacony) VALUES (p_id_kursu, p_id_kursanta, p_id_instruktora, p_godziny_pozostale, p_status, p_oplacony);
 END;
 $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION kursantSzkolenie_management.update_kursanci_szkolenia(IN p_id_postepu INT, IN p_id_kursu INT, IN p_id_kursanta INT, IN p_id_instruktora INT, IN p_godziny_pozostale INT, IN p_status VARCHAR(20), IN p_oplacony BOOLEAN)
+-- Funkcja do edycji istniejących rekordów w tabeli kursanci_szkolenia
+CREATE OR REPLACE FUNCTION zarzadzanie_szkolenia.update_kursanci_szkolenia(IN p_id_postepu INT, IN p_id_kursu INT, IN p_id_kursanta INT, IN p_id_instruktora INT, IN p_godziny_pozostale INT, IN p_status VARCHAR(20), IN p_oplacony BOOLEAN)
 RETURNS VOID AS $$
 BEGIN
-    UPDATE kursantSzkolenie_management.kursanci_szkolenia SET id_kursu = p_id_kursu, id_kursanta = p_id_kursanta, id_instruktora = p_id_instruktora, godziny_pozostale = p_godziny_pozostale, status = p_status, oplacony = p_oplacony WHERE id_postepu = p_id_postepu;
+    UPDATE kursanci_szkolenia SET id_kursu = p_id_kursu, id_kursanta = p_id_kursanta, id_instruktora = p_id_instruktora, godziny_pozostale = p_godziny_pozostale, status = p_status, oplacony = p_oplacony WHERE id_postepu = p_id_postepu;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Postęp kursanta o id_postepu = % nie istnieje', p_id_postepu;
     END IF;
@@ -771,10 +833,11 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION kursantSzkolenie_management.delete_from_kursanci_szkolenia(IN p_id_postepu INT)
+-- Funkcja do usuwania rekordów w tabeli kursanci_szkolenia
+CREATE OR REPLACE FUNCTION zarzadzanie_szkolenia.delete_from_kursanci_szkolenia(IN p_id_postepu INT)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM kursantSzkolenie_management.kursanci_szkolenia WHERE id_postepu = p_id_postepu;
+    DELETE FROM kursanci_szkolenia WHERE id_postepu = p_id_postepu;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Postęp kursanta o id_postepu = % nie istnieje', p_id_postepu;
     END IF;
@@ -783,19 +846,21 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION plac_management.insert_into_rezerwacje_plac(IN p_nr_toru INT, IN p_data_rezerwacji DATE, IN p_godzina_start TIME, IN p_godzina_koniec TIME)
+-- Funkcja do tworzenia nowych rekordów w tabeli rezerwacje_plac
+CREATE OR REPLACE FUNCTION zarzadzanie_plac.insert_into_rezerwacje_plac(IN p_nr_toru INT, IN p_data_rezerwacji DATE, IN p_godzina_start TIME, IN p_godzina_koniec TIME)
 RETURNS VOID AS $$
 BEGIN
-    INSERT INTO plac_management.rezerwacje_plac (nr_toru, data_rezerwacji, godzina_start, godzina_koniec) VALUES (p_nr_toru, p_data_rezerwacji, p_godzina_start, p_godzina_koniec);
+    INSERT INTO rezerwacje_plac (nr_toru, data_rezerwacji, godzina_start, godzina_koniec) VALUES (p_nr_toru, p_data_rezerwacji, p_godzina_start, p_godzina_koniec);
 END;
 $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION plac_management.update_rezerwacje_plac(IN p_id_rezerwacji INT, IN p_nr_toru INT, IN p_data_rezerwacji DATE, IN p_godzina_start TIME, IN p_godzina_koniec TIME)
+-- Funkcja do edycji istniejących rekordów w tabeli rezerwacje_plac
+CREATE OR REPLACE FUNCTION zarzadzanie_plac.update_rezerwacje_plac(IN p_id_rezerwacji INT, IN p_nr_toru INT, IN p_data_rezerwacji DATE, IN p_godzina_start TIME, IN p_godzina_koniec TIME)
 RETURNS VOID AS $$
 BEGIN
-    UPDATE plac_management.rezerwacje_plac SET nr_toru = p_nr_toru, data_rezerwacji = p_data_rezerwacji, godzina_start = p_godzina_start, godzina_koniec = p_godzina_koniec WHERE id_rezerwacji = p_id_rezerwacji;
+    UPDATE rezerwacje_plac SET nr_toru = p_nr_toru, data_rezerwacji = p_data_rezerwacji, godzina_start = p_godzina_start, godzina_koniec = p_godzina_koniec WHERE id_rezerwacji = p_id_rezerwacji;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Rezerwacja o id_rezerwacji = % nie istnieje', p_id_rezerwacji;
     END IF;
@@ -804,10 +869,11 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION plac_management.delete_from_rezerwacje_plac(IN p_id_rezerwacji INT)
+-- Funkcja do usuwania rekordów w tabeli rezerwacje_plac
+CREATE OR REPLACE FUNCTION zarzadzanie_plac.delete_from_rezerwacje_plac(IN p_id_rezerwacji INT)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM plac_management.rezerwacje_plac WHERE id_rezerwacji = p_id_rezerwacji;
+    DELETE FROM rezerwacje_plac WHERE id_rezerwacji = p_id_rezerwacji;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Rezerwacja o id_rezerwacji = % nie istnieje', p_id_rezerwacji;
     END IF;
@@ -816,19 +882,21 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION jazda_management.insert_into_jazdy(IN p_id_instruktora INT, IN p_id_pojazdu INT, IN p_id_kursanta INT, IN p_id_rezerwacji INT, IN p_godzina_rozpoczecia TIMESTAMP, IN p_godzina_zakonczenia TIMESTAMP)
+-- Funkcja do tworzenia nowych rekordów w tabeli jazdy
+CREATE OR REPLACE FUNCTION zarzadzanie_jazdy.insert_into_jazdy(IN p_id_instruktora INT, IN p_id_pojazdu INT, IN p_id_kursanta INT, IN p_id_rezerwacji INT, IN p_godzina_rozpoczecia TIMESTAMP, IN p_godzina_zakonczenia TIMESTAMP)
 RETURNS VOID AS $$
 BEGIN
-    INSERT INTO jazda_management.jazdy (id_instruktora, id_pojazdu, id_kursanta, id_rezerwacji, godzina_rozpoczecia, godzina_zakonczenia) VALUES (p_id_instruktora, p_id_pojazdu, p_id_kursanta, p_id_rezerwacji, p_godzina_rozpoczecia, p_godzina_zakonczenia);
+    INSERT INTO jazdy (id_instruktora, id_pojazdu, id_kursanta, id_rezerwacji, godzina_rozpoczecia, godzina_zakonczenia) VALUES (p_id_instruktora, p_id_pojazdu, p_id_kursanta, p_id_rezerwacji, p_godzina_rozpoczecia, p_godzina_zakonczenia);
 END;
 $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION jazda_management.update_jazdy(IN p_id_jazdy INT, IN p_id_instruktora INT, IN p_id_pojazdu INT, IN p_id_kursanta INT, IN p_id_rezerwacji INT, IN p_godzina_rozpoczecia TIMESTAMP, IN p_godzina_zakonczenia TIMESTAMP)
+-- Funkcja do edycji istniejących rekordów w tabeli jazdy
+CREATE OR REPLACE FUNCTION zarzadzanie_jazdy.update_jazdy(IN p_id_jazdy INT, IN p_id_instruktora INT, IN p_id_pojazdu INT, IN p_id_kursanta INT, IN p_id_rezerwacji INT, IN p_godzina_rozpoczecia TIMESTAMP, IN p_godzina_zakonczenia TIMESTAMP)
 RETURNS VOID AS $$
 BEGIN
-    UPDATE jazda_management.jazdy SET id_instruktora = p_id_instruktora, id_pojazdu = p_id_pojazdu, id_kursanta = p_id_kursanta, id_rezerwacji = p_id_rezerwacji, godzina_rozpoczecia = p_godzina_rozpoczecia, godzina_zakonczenia = p_godzina_zakonczenia WHERE id_jazdy = p_id_jazdy;
+    UPDATE jazdy SET id_instruktora = p_id_instruktora, id_pojazdu = p_id_pojazdu, id_kursanta = p_id_kursanta, id_rezerwacji = p_id_rezerwacji, godzina_rozpoczecia = p_godzina_rozpoczecia, godzina_zakonczenia = p_godzina_zakonczenia WHERE id_jazdy = p_id_jazdy;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Jazda o id_jazdy = % nie istnieje', p_id_jazdy;
     END IF;
@@ -837,10 +905,11 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION jazda_management.delete_from_jazdy(IN p_id_jazdy INT)
+-- Funkcja do usuwania rekordów w tabeli jazdy
+CREATE OR REPLACE FUNCTION zarzadzanie_jazdy.delete_from_jazdy(IN p_id_jazdy INT)
 RETURNS VOID AS $$
 BEGIN
-    DELETE FROM jazda_management.jazdy WHERE id_jazdy = p_id_jazdy;
+    DELETE FROM jazdy WHERE id_jazdy = p_id_jazdy;
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Jazda o id_jazdy = % nie istnieje', p_id_jazdy;
     END IF;
@@ -849,53 +918,8 @@ $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION plac_management.check_plac_availability(IN p_nr_toru INT, IN p_data_rezerwacji DATE, IN p_godzina_start TIME, IN p_godzina_koniec TIME)
-RETURNS BOOLEAN AS $$
-DECLARE
-    conflict_exists BOOLEAN;
-BEGIN
-    SELECT EXISTS (
-        SELECT 1 FROM plac_management.rezerwacje_plac WHERE nr_toru = p_nr_toru AND data_rezerwacji = p_data_rezerwacji AND ((godzina_start < p_godzina_koniec AND godzina_koniec > p_godzina_start))
-    ) INTO conflict_exists;
-    RETURN NOT conflict_exists;
-END;
-$$ LANGUAGE plpgsql;
-
-
-
-CREATE OR REPLACE FUNCTION kursantSzkolenie_management.update_status_on_complete() 
-RETURNS TRIGGER AS $$
-BEGIN
-    IF NEW.godziny_pozostale = 0 THEN 
-        UPDATE kursantSzkolenie_management.kursanci_szkolenia SET status = 'Zakończony' WHERE id_postepu = NEW.id_postepu;
-    END IF;
-    
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-
-
-CREATE TRIGGER trg_update_status_on_complete AFTER UPDATE ON kursantSzkolenie_management.kursanci_szkolenia
-FOR EACH ROW WHEN (NEW.godziny_pozostale = 0)
-EXECUTE FUNCTION kursantSzkolenie_management.update_status_on_complete();
-
-
-
-CREATE OR REPLACE FUNCTION szkolenie_management.report_remaining_hours()
-RETURNS TABLE (kurs_name VARCHAR(40), kursant_name VARCHAR(60), godziny_pozostale INT) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT s.nazwa, k.imie || ' ' || k.nazwisko, ks.godziny_pozostale FROM kursanci_szkolenia ks JOIN kursanci k ON ks.id_kursanta = k.id_kursanta JOIN szkolenia s ON ks.id_kursu = s.id_kursu;
-END;
-$$ LANGUAGE plpgsql;
-
-
-
-
-
--- zapisywanie na kurs 
-CREATE OR REPLACE FUNCTION zapisz_na_kurs(
+-- Funkcja do zapisywania kursanta na kurs 
+CREATE OR REPLACE FUNCTION zarzadzanie_osoby.zapisz_na_kurs(
     p_imie_kursanta VARCHAR(20),
     p_nazwisko_kursanta VARCHAR(40),
     p_data_urodzenia DATE,
@@ -914,55 +938,55 @@ DECLARE
     v_instruktor_ma_uprawnienia BOOLEAN;
     v_instruktorzy_z_uprawnieniami TEXT[];
 BEGIN
-    
+    -- Sprawdzanie czy kursant już istnieje w bazie
     SELECT id_kursanta INTO v_id_kursanta
-    FROM kursant_management.kursanci
+    FROM kursanci
     WHERE imie = p_imie_kursanta AND nazwisko = p_nazwisko_kursanta;
 
+    -- Jeśli kursant nie istnieje, dodaje się go do bazy
     IF v_id_kursanta IS NULL THEN
-        INSERT INTO kursant_management.kursanci (imie, nazwisko, data_urodzenia, telefon, email)
+        INSERT INTO kursanci (imie, nazwisko, data_urodzenia, telefon, email)
         VALUES (p_imie_kursanta, p_nazwisko_kursanta, p_data_urodzenia, p_telefon, p_email)
-        RETURNING id_kursanta INTO v_id_kursanta;
+        RETURNING id_kursanta INTO v_id_kursanta; -- Zwrot ID nowego kursanta
     END IF;
 
-
-
-    IF NOT EXISTS (SELECT 1 FROM szkolenie_management.szkolenia WHERE nazwa = p_kategoria) THEN
-        RAISE EXCEPTION 'Kategoria % nie istnieje', p_kategoria;
+    -- Sprawdzanie czy podana kategoria kursu istnieje w tabeli
+    IF NOT EXISTS (SELECT 1 FROM szkolenia WHERE nazwa = p_kategoria) THEN
+        RAISE EXCEPTION 'Kategoria % nie istnieje', p_kategoria; -- Jeśli nie to wyrzuca wyjątek
     END IF;
-    v_id_kategorii := p_kategoria;
+    v_id_kategorii := p_kategoria; -- Ustawienie ID kategorii
 
-
-
+    -- Sprawdzenie czy instruktor istnieje w bazie
     SELECT id_instruktora INTO v_id_instruktora
-    FROM instruktor_management.instruktorzy
+    FROM instruktorzy
     WHERE imie = p_imie_instruktora AND nazwisko = p_nazwisko_instruktora;
 
+    -- Jeśli instruktor nie istnieje to wyrzuca wyjątek
     IF v_id_instruktora IS NULL THEN
         RAISE EXCEPTION 'Instruktor % % nie istnieje', p_imie_instruktora, p_nazwisko_instruktora;
     END IF;
 
-
-
+    -- Sprawdzenie czy instruktor ma uprawnienia do prowadzenia kursów w danej kategorii
     SELECT EXISTS (
-        SELECT 1 FROM uprawnienie_management.uprawnienia
+        SELECT 1 FROM uprawnienia
         WHERE id_instruktora = v_id_instruktora AND kategoria = v_id_kategorii
     ) INTO v_instruktor_ma_uprawnienia;
 
+    -- Jeśli instruktor nie ma uprawnień zwraca listę dostępnych instruktorów z uprawnieniami
     IF NOT v_instruktor_ma_uprawnienia THEN
         SELECT ARRAY_AGG(i.imie || ' ' || i.nazwisko)
         INTO v_instruktorzy_z_uprawnieniami
-        FROM instruktor_management.instruktorzy i
-        JOIN uprawnienie_management.uprawnienia u ON i.id_instruktora = u.id_instruktora
+        FROM instruktorzy i
+        JOIN uprawnienia u ON i.id_instruktora = u.id_instruktora
         WHERE u.kategoria = v_id_kategorii;
 
+        -- Zgłasza wyjątek z listą instruktorów którzy mają uprawnienia
         RAISE EXCEPTION 'Instruktor % % nie ma uprawnień na kategorię %. Dostępni instruktorzy: %',
             p_imie_instruktora, p_nazwisko_instruktora, v_id_kategorii, v_instruktorzy_z_uprawnieniami;
     END IF;
 
-
-
-    INSERT INTO kursantSzkolenie_management.kursanci_szkolenia (
+    -- Dodanie kursanta na wybrany kurs
+    INSERT INTO kursanci_szkolenia (
         id_kursu,
         id_kursanta,
         id_instruktora,
@@ -971,10 +995,10 @@ BEGIN
         oplacony
     )
     VALUES (
-        (SELECT id_kursu FROM szkolenie_management.szkolenia WHERE nazwa = v_id_kategorii LIMIT 1),
+        (SELECT id_kursu FROM szkolenia WHERE nazwa = v_id_kategorii LIMIT 1),
         v_id_kursanta,
         v_id_instruktora,
-        (SELECT godziny FROM szkolenie_management.szkolenia WHERE nazwa = v_id_kategorii LIMIT 1),
+        (SELECT godziny FROM szkolenia WHERE nazwa = v_id_kategorii LIMIT 1),
         'aktywny',
         p_oplacony
     );
@@ -983,59 +1007,8 @@ $$ LANGUAGE plpgsql;
 
 
 
-
-
--- dostepnosc torow na placu
-CREATE OR REPLACE FUNCTION sprawdz_dostepnosc_torow(
-    p_kategoria VARCHAR(5),
-    p_data DATE,
-    p_godzina TIME
-)
-RETURNS TABLE (
-    nr_toru INT,
-    status TEXT
-) AS $$
-DECLARE
-    dostepne_tory RECORD;
-BEGIN
-    
-    FOR dostepne_tory IN
-        SELECT p.nr_toru
-        FROM plac_management.plac p
-        WHERE p.kategoria = p_kategoria
-          AND p.otwarcie <= p_godzina
-          AND p.zamkniecie > p_godzina
-          AND NOT EXISTS (
-              SELECT 1
-              FROM plac_management.rezerwacje_plac r
-              WHERE r.nr_toru = p.nr_toru
-                AND r.data_rezerwacji = p_data
-                AND r.godzina_start <= p_godzina
-                AND r.godzina_koniec > p_godzina
-          )
-    LOOP
-        RETURN QUERY SELECT dostepne_tory.nr_toru, 'Dostępny' AS status;
-    END LOOP;
-
-    
-    IF NOT FOUND THEN
-        FOR dostepne_tory IN
-            SELECT DISTINCT r.data_rezerwacji, r.nr_toru
-            FROM plac_management.rezerwacje_plac r
-            JOIN plac p ON r.nr_toru = p.nr_toru
-            WHERE p.kategoria = p_kategoria
-            ORDER BY r.data_rezerwacji ASC
-        LOOP
-            RETURN QUERY SELECT dostepne_tory.nr_toru, 'Dostępny w innym terminie' AS status;
-        END LOOP;
-    END IF;
-END;
-$$ LANGUAGE plpgsql;
-
-
-
--- raport o zdajacym
-CREATE OR REPLACE FUNCTION kursant_management.raport_kursanta(IN p_id_kursanta INT)
+-- Funkcja do generowania raportu o kursancie (oblicza liczbę pozostałych godzin do wyjeżdżenia)
+CREATE OR REPLACE FUNCTION zarzadzanie_osoby.raport_kursanta(IN p_id_kursanta INT)
 RETURNS TABLE (
     kursant_imie VARCHAR(20),
     kursant_nazwisko VARCHAR(40),
@@ -1044,160 +1017,167 @@ RETURNS TABLE (
     godziny_pozostale INT,
     jazda_data TIMESTAMP
 ) AS $$
+DECLARE
+    -- Całkowita liczba godzin przypisana kursantowi
+    v_godziny_poczatkowe INT; 
+    -- Liczba godzin zużytych dotychczas
+    v_godziny_zuzyte NUMERIC := 0; 
+    -- Zmienna rekordowa do przechowywania wyników zapytania
+    jazda_record RECORD; 
 BEGIN
-    RETURN QUERY
-    SELECT 
-        k.imie AS kursant_imie,
-        k.nazwisko AS kursant_nazwisko,
-        k.telefon AS kursant_telefon,
-        k.email AS kursant_email,
-        ks.godziny_pozostale,
-        j.godzina_rozpoczecia AS jazda_data
-    FROM 
-        kursant_management.kursanci k
-    INNER JOIN 
-        kursantSzkolenie_management.kursanci_szkolenia ks 
-        ON k.id_kursanta = ks.id_kursanta
-    LEFT JOIN 
-        jazda_management.jazdy j 
-        ON k.id_kursanta = j.id_kursanta
-    WHERE 
-        k.id_kursanta = p_id_kursanta;
+    -- Pobranie liczby godzin przypisanej do kursanta
+    SELECT ks.godziny_pozostale
+    INTO v_godziny_poczatkowe
+    FROM kursanci_szkolenia ks
+    WHERE ks.id_kursanta = p_id_kursanta;
+
+    -- Iteracja po jazdach kursanta, sortując je chronologicznie
+    FOR jazda_record IN
+        SELECT 
+            -- Data rozpoczęcia jazdy
+            j.godzina_rozpoczecia AS jazda_data,
+            -- Obliczenie czasu jazdy w godzinach
+            EXTRACT(EPOCH FROM (j.godzina_zakonczenia - j.godzina_rozpoczecia)) / 3600 AS godziny_jezdzone
+        FROM 
+            jazdy j
+        WHERE 
+            -- Filtrowanie jazd dla konkretnego kursanta
+            j.id_kursanta = p_id_kursanta
+        ORDER BY 
+            -- Sortowanie jazd chronologicznie
+            j.godzina_rozpoczecia
+    LOOP
+        -- Aktualizacja liczby godzin wyjeżdżonych przez kursanta
+        v_godziny_zuzyte := v_godziny_zuzyte + jazda_record.godziny_jezdzone;
+
+        -- Przypisanie wartości do zmiennych wyjściowych
+        kursant_imie := (SELECT imie FROM kursanci WHERE id_kursanta = p_id_kursanta);
+        kursant_nazwisko := (SELECT nazwisko FROM kursanci WHERE id_kursanta = p_id_kursanta);
+        kursant_telefon := (SELECT telefon FROM kursanci WHERE id_kursanta = p_id_kursanta);
+        kursant_email := (SELECT email FROM kursanci WHERE id_kursanta = p_id_kursanta);
+
+        -- Obliczenie pozostałych godzin (całkowita liczba godzin minus godziny wyjeżdżone)
+        godziny_pozostale := GREATEST(0, v_godziny_poczatkowe - CEIL(v_godziny_zuzyte)::INT);
+        -- Przypisanie daty jazdy do zmiennej
+        jazda_data := jazda_record.jazda_data;
+
+        -- Zwrócenie rekordu z zaktualizowanymi danymi
+        RETURN NEXT;
+    END LOOP;
+
+    -- Jeżeli nie było żadnych jazd, zwraca jeden rekord z pełnymi danymi i początkową liczbą godzin
+    -- Sprawdzenie, czy pętla nie wykonała się
+    IF NOT FOUND THEN
+        RETURN QUERY
+        SELECT 
+            k.imie, 
+            k.nazwisko, 
+            k.telefon, 
+            k.email, 
+            -- W przypadku braku jazd zwraca początkową liczbę godzin
+            v_godziny_poczatkowe AS godziny_pozostale, 
+            -- Brak daty jazdy, ponieważ kursant nie odbył jeszcze jazd
+            NULL AS jazda_data
+        FROM 
+            kursanci k
+        WHERE 
+            -- Pobieranie danych dla kursanta o podanym ID
+            k.id_kursanta = p_id_kursanta;
+    END IF;
 END;
 $$ LANGUAGE plpgsql;
 
 
 
--- sprawdza dostępność pojazdu zwraca false/true
-CREATE OR REPLACE FUNCTION dostepnosc_pojazdu(
-    IN p_id_pojazdu INT,
+-- Funkcja sprawdzająca dostępność pojazdu
+CREATE OR REPLACE FUNCTION zarzadzanie_pojazdy.dostepnosc_pojazdu(
+    IN p_kategoria VARCHAR(5),
     IN p_start_time TIMESTAMP,
     IN p_end_time TIMESTAMP
-) RETURNS BOOLEAN AS $$
-DECLARE
-    conflict_exists BOOLEAN;
+) RETURNS TABLE (
+    id_pojazdu INT,
+    nr_rejestracyjny VARCHAR(8),
+    marka VARCHAR(20),
+    model VARCHAR(40)
+) AS $$
 BEGIN
-    SELECT EXISTS (
-        SELECT 1 FROM jazda_management.jazdy 
-        WHERE id_pojazdu = p_id_pojazdu 
-        AND ((p_start_time < godzina_zakonczenia AND p_end_time > godzina_rozpoczecia))
-    ) INTO conflict_exists;
-    RETURN NOT conflict_exists;
+    -- Zapytanie zwracające pojazdy spełniające kryteria dostępności
+    RETURN QUERY
+    SELECT 
+        p.id_pojazdu,
+        p.nr_rejestracyjny,
+        p.marka,
+        p.model
+    FROM 
+        pojazdy p
+    WHERE 
+        -- Filtrowanie pojazdów po kategorii
+        p.kategoria = p_kategoria
+        -- Upewnienie się, że pojazd nie jest już zarezerwowany w danym czasie
+        AND NOT EXISTS ( 
+            -- Sprawdzenie, czy pojazd jest już zaplanowany na inny kurs w tym czasie
+            SELECT 1  
+            FROM jazdy j
+            -- Sprawdzenie, czy okresy czasowe się nakładają
+            WHERE j.id_pojazdu = p.id_pojazdu
+            AND (
+                p_start_time < j.godzina_zakonczenia AND 
+                p_end_time > j.godzina_rozpoczecia
+            )
+        );
 END;
 $$ LANGUAGE plpgsql;
 
 
 
--- po jeździe odejmuje godziny pozostałe
-CREATE OR REPLACE FUNCTION kursantSzkolenie_management.update_godziny_pozostale()
-RETURNS VOID AS $$
-BEGIN
-    UPDATE kursantSzkolenie_management.kursanci_szkolenia ks
-    SET godziny_pozostale = ks.godziny_pozostale - subquery.godziny_przejechane
-    FROM (
-        SELECT 
-            j.id_kursanta,
-            SUM(EXTRACT(EPOCH FROM (j.godzina_zakonczenia - j.godzina_rozpoczecia)) / 3600) AS godziny_przejechane
-        FROM jazda_management.jazdy j
-        GROUP BY j.id_kursanta
-    ) subquery
-    WHERE ks.id_kursanta = subquery.id_kursanta
-      AND ks.godziny_pozostale > 0; 
-END;
-$$ LANGUAGE plpgsql;
-
-
-
--- ilość godzin przepracowanych w miesiacu przez instruktora
-CREATE OR REPLACE FUNCTION instruktor_management.suma_godzin_instruktora_w_miesiacu(
-    p_id_instruktora INT,
-    p_rok INT,
-    p_miesiac INT
+-- Funkcja sprawdzająca dostępność placu manewrowego
+CREATE OR REPLACE FUNCTION zarzadzanie_plac.sprawdz_dostepnosc_torow(
+    p_kategoria VARCHAR(5),
+    p_data DATE,
+    p_godzina TIME
 )
-RETURNS DECIMAL AS $$
-DECLARE
-    v_suma_godzin DECIMAL;
+RETURNS TABLE (
+    nr_toru INT,
+    status TEXT
+) AS $$
 BEGIN
-    miesiącu
-    SELECT COALESCE(SUM(EXTRACT(EPOCH FROM (godzina_zakonczenia - godzina_rozpoczecia)) / 3600), 0)
-    INTO v_suma_godzin
-    FROM jazda_management.jazdy
-    WHERE id_instruktora = p_id_instruktora
-      AND EXTRACT(YEAR FROM godzina_rozpoczecia) = p_rok
-      AND EXTRACT(MONTH FROM godzina_rozpoczecia) = p_miesiac;
+    -- Zapytanie zwraca dostępne tory dla podanej kategorii, daty i godziny
+    RETURN QUERY
+    -- Jeśli tor jest dostępny, jego numer i status "Dostępny"
+    SELECT p.nr_toru, 'Dostępny' AS status
+    FROM plac p
+    -- Sprawdzenie, czy kategoria placu pasuje do podanej kategorii
+    WHERE p.kategoria = p_kategoria
+        -- Sprawdzenie, czy godzina rozpoczęcia mieści się w godzinach otwarcia placu
+      AND p.otwarcie <= p_godzina
+      -- Sprawdzenie, czy godzina zakończenia mieści się przed godziną zamknięcia placu
+      AND p.zamkniecie > p_godzina
+      -- Sprawdzenie, czy tor nie jest już zarezerwowany w podanym czasie
+      AND NOT EXISTS (
+          SELECT 1
+          FROM rezerwacje_plac r
+          -- Identyfikacja rezerwacji dla tego samego toru
+          WHERE r.nr_toru = p.nr_toru
+            -- Sprawdzenie, czy rezerwacja jest na podaną datę
+            AND r.data_rezerwacji = p_data
+            -- Sprawdzenie, czy godzina rozpoczęcia rezerwacji pokrywa się z podaną godziną
+            AND r.godzina_start <= p_godzina
+            -- Sprawdzenie, czy godzina zakończenia rezerwacji pokrywa się z podaną godziną
+            AND r.godzina_koniec > p_godzina
+      );
 
-      RETURN v_suma_godzin;
+    -- Jeśli brak dostępnych torów, sugeruje inne dostępne terminy
+    -- Sprawdzenie, czy zapytanie nie zwróciło żadnych wyników
+    IF NOT FOUND THEN
+        RETURN QUERY
+        -- Zwraca tor z innym terminem dostępności
+        SELECT DISTINCT r.nr_toru, 'Dostępny w innym terminie' AS status
+        FROM rezerwacje_plac r
+        JOIN plac p ON r.nr_toru = p.nr_toru
+        -- Filtruje po kategorii placu
+        WHERE p.kategoria = p_kategoria
+        -- Sortuje wyniki według daty rezerwacji
+        ORDER BY r.data_rezerwacji ASC, r.godzina_start ASC;
+    END IF;
 END;
 $$ LANGUAGE plpgsql;
-
-
--- przez ile godzin był uzywany dany tor na placu w miesiącu
-CREATE OR REPLACE FUNCTION plac_management.licz_godziny_uzycia_toru_w_miesiacu(
-    p_nr_toru INT, 
-    p_miesiac INT, 
-    p_rok INT
-)
-RETURNS INT AS $$
-DECLARE
-    v_godziny_uzycia INT := 0;
-BEGIN
-
-    SELECT SUM(EXTRACT(EPOCH FROM (j.godzina_zakonczenia - j.godzina_rozpoczecia)) / 3600) 
-    INTO v_godziny_uzycia
-    FROM jazda_management.jazdy j
-    JOIN plac_management.rezerwacje_plac r ON j.id_rezerwacji = r.id_rezerwacji
-    WHERE r.nr_toru = p_nr_toru
-      AND EXTRACT(MONTH FROM r.data_rezerwacji) = p_miesiac
-      AND EXTRACT(YEAR FROM r.data_rezerwacji) = p_rok;
-    
-    RETURN COALESCE(v_godziny_uzycia, 0);
-END;
-$$ LANGUAGE plpgsql;
-
-
-
--- KURSORY
-DECLARE instr_cursor CURSOR FOR
-SELECT * FROM instruktor_management.instruktorzy;
-
-
-DECLARE kursant_cursor CURSOR FOR
-SELECT * FROM kursant_management.kursanci;
-
-DECLARE jazdy_cursor CURSOR FOR
-SELECT * FROM jazda_management.jazdy;
-
-DECLARE kurs_szkol_cursor CURSOR FOR
-SELECT * FROM kursantSzkolenie_management.kursanci_szkolenia;
-
-DECLARE plac_cursor CURSOR FOR
-SELECT * FROM plac_management.plac;
-
-
-DECLARE rezerwacje_plac_cursor CURSOR FOR
-SELECT * FROM plac_management.rezerwacje_plac;
-
-
-DECLARE pojazdy_cursor CURSOR FOR
-SELECT * FROM pojazd_management.pojazdy;
-
-DECLARE szkolenia_cursor CURSOR FOR
-SELECT * FROM szkolenie_management.szkolenia;
-
-DECLARE uprawnienia_cursor CURSOR FOR
-SELECT * FROM uprawnienie_management.uprawnienia;
-
-
-DECLARE kursant_cursor_kurs CURSOR FOR
-SELECT k.id_kursanta, k.imie, k.nazwisko 
-FROM kursant_management.kursanci k
-JOIN kursantSzkolenie_management.kursanci_szkolenia ks ON k.id_kursanta = ks.id_kursanta
-WHERE ks.id_kursu = 1;
-
-
-DECLARE completed_cursor CURSOR FOR
-SELECT ks.id_kursanta, ks.status 
-FROM kursantSzkolenie_management.kursanci_szkolenia ks 
-WHERE ks.status = 'Ukończono';
-
-

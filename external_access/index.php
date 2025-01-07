@@ -27,5 +27,15 @@ include 'config.php';
             <li><a href="table.php?table=jazdy">Jazdy</a></li>
         </ul>
     </nav>
+    <h1>Inne możliwe opcje</h1>
+    <nav>
+        <ul>
+            <!-- Linki do pozostałych funkcjonalności -->
+            <li><a href="sign_for_course.php">Zapisz osobę na kurs</a></li>
+            <li><a href="student_report.php">Raport o kursancie</a></li>
+            <li><a href="vehicle_availability.php">Sprawdź dostępność pojazdu</a></li>
+            <li><a href="place_availability.php">Sprawdź dostępność placu</a></li>
+        </ul>
+    <nav>
 </body>
 </html>
