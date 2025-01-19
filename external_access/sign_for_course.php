@@ -10,9 +10,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $telefon = $_POST['telefon'] ?? '';
     $email = $_POST['email'] ?? '';
     $kategoria = $_POST['kategoria'] ?? '';
-    $imie_instruktora = $_POST['imie_instruktora'] ?? '';
-    $nazwisko_instruktora = $_POST['nazwisko_instruktora'] ?? '';
+    $dane_instruktora = $_POST['dane_instruktora'] ?? '';
     $oplacony = isset($_POST['oplacony']) ? 1 : 0; // Przekazanie wartości true/false
+
+    $imie_instruktora = '';
+    $nazwisko_instruktora = '';
+
+    // Rozbicie wartości pobranej z formularza do zmiennych które będą parametrami przekazywanymi do funkcji
+    if ($dane_instruktora) {
+        list($imie_instruktora, $nazwisko_instruktora) = explode(' ', $dane_instruktora, 2);
+    }
 
     // Wywołanie funkcji zapisującej kursanta na kurs
     $stmt = $pdo->prepare("SELECT zarzadzanie_osoby.zapisz_na_kurs(
@@ -20,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         :kategoria, :imie_instruktora, :nazwisko_instruktora, :oplacony
     )");
 
-    // Powiązanie zmiennyhc PHP z zapytaniem SQL
+    // Powiązanie zmiennych PHP z zapytaniem SQL
     $stmt->bindParam(':imie_kursanta', $imie_kursanta);
     $stmt->bindParam(':nazwisko_kursanta', $nazwisko_kursanta);
     $stmt->bindParam(':data_urodzenia', $data_urodzenia);
@@ -74,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <div>
             <label for="data_urodzenia">Data urodzenia:</label>
-            <input type="date" id="data_urodzenia" name="data_urodzenia" required>
+            <input type="text" id="data_urodzenia" name="data_urodzenia" required>
         </div>
         <div>
             <label for="telefon">Telefon:</label>
@@ -86,15 +93,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <div>
             <label for="kategoria">Kategoria kursu:</label>
-            <input type="text" id="kategoria" name="kategoria" required>
+            <select id="kategoria" name="kategoria" required>
+                <option value="">Wybierz kurs</option>
+                <?php
+                // Pobranie dostępnych kursów z bazy danych
+                $stmt = $pdo->query("SELECT id_kursu, nazwa FROM szkolenia");
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    echo '<option value="' . $row['nazwa'] . '">' . $row['nazwa'] . '</option>';
+                }
+                ?>
+            </select>
         </div>
         <div>
-            <label for="imie_instruktora">Imię instruktora:</label>
-            <input type="text" id="imie_instruktora" name="imie_instruktora" required>
-        </div>
-        <div>
-            <label for="nazwisko_instruktora">Nazwisko instruktora:</label>
-            <input type="text" id="nazwisko_instruktora" name="nazwisko_instruktora" required>
+            <label for="dane_instruktora">Dane instruktora:</label>
+            <select id="dane_instruktora" name="dane_instruktora" required>
+                <option value="">Wybierz instruktora</option>
+                <?php
+                // Pobranie listy instruktorów z bazy danych
+                $stmt = $pdo->query("SELECT id_instruktora, imie, nazwisko FROM instruktorzy");
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    // Łączenie imienia i nazwiska w jeden ciąg tekstowy jako 'value'
+                    $dane_instruktora = $row['imie'] . ' ' . $row['nazwisko'];
+                    echo '<option value="' . htmlspecialchars($dane_instruktora) . '">' . htmlspecialchars($dane_instruktora) . '</option>';
+                }
+                ?>
+            </select>
         </div>
         <div>
             <label for="oplacony">Opłacony:</label>

@@ -66,7 +66,7 @@ function isEditable($column, $primaryKey) {
 
 // Procedury dla tabel
 $procedures = [
-    'instruktorzy' => 'zarzadzanie_osoby.update_instruktory',
+    'instruktorzy' => 'zarzadzanie_osoby.update_instruktorzy',
     'kursanci' => 'zarzadzanie_osoby.update_kursanci',
     'szkolenia' => 'zarzadzanie_szkolenia.update_szkolenia',
     'pojazdy' => 'zarzadzanie_pojazdy.update_pojazdy',
@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Zbieranie danych z formularza, uwzględniając klucz główny
     foreach ($columns as $column) {
         if (isEditable($column, $primaryKey)) {
-            $updatedData[$column] = $_POST[$column] ?? null;
+            $updatedData[$column] = ($_POST[$column] === '' ? null : $_POST[$column]);
         }
     }
 

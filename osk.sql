@@ -896,7 +896,12 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION zarzadzanie_jazdy.update_jazdy(IN p_id_jazdy INT, IN p_id_instruktora INT, IN p_id_pojazdu INT, IN p_id_kursanta INT, IN p_id_rezerwacji INT, IN p_godzina_rozpoczecia TIMESTAMP, IN p_godzina_zakonczenia TIMESTAMP)
 RETURNS VOID AS $$
 BEGIN
-    UPDATE jazdy SET id_instruktora = p_id_instruktora, id_pojazdu = p_id_pojazdu, id_kursanta = p_id_kursanta, id_rezerwacji = p_id_rezerwacji, godzina_rozpoczecia = p_godzina_rozpoczecia, godzina_zakonczenia = p_godzina_zakonczenia WHERE id_jazdy = p_id_jazdy;
+    IF p_id_rezerwacji IS NULL THEN
+        UPDATE jazdy SET id_instruktora = p_id_instruktora, id_pojazdu = p_id_pojazdu, id_kursanta = p_id_kursanta, id_rezerwacji = NULL, godzina_rozpoczecia = p_godzina_rozpoczecia, godzina_zakonczenia = p_godzina_zakonczenia WHERE id_jazdy = p_id_jazdy;
+    ELSE
+        UPDATE jazdy SET id_instruktora = p_id_instruktora, id_pojazdu = p_id_pojazdu, id_kursanta = p_id_kursanta, id_rezerwacji = p_id_rezerwacji, godzina_rozpoczecia = p_godzina_rozpoczecia, godzina_zakonczenia = p_godzina_zakonczenia WHERE id_jazdy = p_id_jazdy;
+    END IF;
+
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Jazda o id_jazdy = % nie istnieje', p_id_jazdy;
     END IF;

@@ -103,7 +103,113 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php foreach ($columns as $column): ?>
             <div>
                 <label for="<?php echo $column['column_name']; ?>"><?php echo $column['column_name']; ?>:</label>
+
+                <?php if (in_array($column['column_name'], ['id_instruktora', 'kategoria', 'id_kursu', 'id_kursanta', 'nr_toru', 'id_pojazdu'])): ?>
+                    
+                    <!-- Menu rozwijane dla poszczególnych kolumn -->
+                    <select id=<?php echo $column['column_name']; ?>" name="<?php echo $column['column_name']; ?>" <?php echo $column['is_nullable'] === 'NO' ? 'required' : ''; ?>>
+                        <option value="">Wybierz</option>
+                        // Pobranie wartości dla menu rozwijanego z odpowiedniej tabeli
+
+                        <?php
+                        $foreignTable = '';
+                        $foreignKey = '';
+                        $labelColumn1 = '';
+                        $labelColumn2 = '';
+
+                        // Obsługa różnych przypadków dla tabel
+                        if ($column['column_name'] === 'id_instruktora') {
+                            $foreignTable = 'instruktorzy';
+                            $foreignKey = 'id_instruktora';
+                            $labelColumn1 = 'imie';
+                            $labelColumn2 = 'nazwisko';
+
+                            $stmt = $pdo->prepare("SELECT $foreignKey, $labelColumn1, $labelColumn2 FROM $foreignTable");
+                            $stmt->execute();
+                            $foreignValues = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                            foreach ($foreignValues as $value) {
+                                $label = htmlspecialchars($value[$labelColumn1]) . ' ' . htmlspecialchars($value[$labelColumn2]);
+                                echo '<option value="' . htmlspecialchars($value[$foreignKey]) . '">' . $label . '</option>';
+                            }
+                        } 
+                        
+                        if ($column['column_name'] === 'kategoria') {
+                            $foreignTable = 'szkolenia';
+                            $foreignKey = 'nazwa';
+
+                            $stmt = $pdo->prepare("SELECT DISTINCT $foreignKey FROM $foreignTable");
+                            $stmt->execute();
+                            $foreignValues = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                            foreach ($foreignValues as $value) {
+                                echo '<option value="' . htmlspecialchars($value[$foreignKey]) . '">' . htmlspecialchars($value[$foreignKey]) . '</option>';
+                            }
+                        }
+
+                        if ($column['column_name'] === 'id_kursu') {
+                            $foreignTable = 'szkolenia';
+                            $foreignKey = 'id_kursu';
+                            $labelColumn1 = 'nazwa';
+
+                            $stmt = $pdo->prepare("SELECT DISTINCT $foreignKey, $labelColumn1 FROM $foreignTable");
+                            $stmt->execute();
+                            $foreignValues = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                            foreach ($foreignValues as $value) {
+                                echo '<option value="' . htmlspecialchars($value[$foreignKey]) . '">' . htmlspecialchars($value[$labelColumn1]) . '</option>';
+                            }
+                        }     
+
+                        if ($column['column_name'] === 'id_kursanta') {
+                            $foreignTable = 'kursanci';
+                            $foreignKey = 'id_kursanta';
+                            $labelColumn1 = 'imie';
+                            $labelColumn2 = 'nazwisko';
+
+                            $stmt = $pdo->prepare("SELECT $foreignKey, $labelColumn1, $labelColumn2 FROM $foreignTable");
+                            $stmt->execute();
+                            $foreignValues = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                            foreach ($foreignValues as $value) {
+                                $label = htmlspecialchars($value[$labelColumn1]) . ' ' . htmlspecialchars($value[$labelColumn2]);
+                                echo '<option value="' . htmlspecialchars($value[$foreignKey]) . '">' . $label . '</option>';
+                            }
+                        } 
+
+                        if ($column['column_name'] === 'nr_toru') {
+                            $foreignTable = 'plac';
+                            $foreignKey = 'nr_toru';
+
+                            $stmt = $pdo->prepare("SELECT DISTINCT $foreignKey FROM $foreignTable");
+                            $stmt->execute();
+                            $foreignValues = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                            foreach ($foreignValues as $value) {
+                                echo '<option value="' . htmlspecialchars($value[$foreignKey]) . '">' . htmlspecialchars($value[$foreignKey]) . '</option>';
+                            }
+                        }
+
+                        if ($column['column_name'] === 'id_pojazdu') {
+                            $foreignTable = 'pojazdy';
+                            $foreignKey = 'id_pojazdu';
+                            $labelColumn1 = 'nr_rejestracyjny';
+
+                            $stmt = $pdo->prepare("SELECT DISTINCT $foreignKey, $labelColumn1 FROM $foreignTable");
+                            $stmt->execute();
+                            $foreignValues = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                            foreach ($foreignValues as $value) {
+                                echo '<option value="' . htmlspecialchars($value[$foreignKey]) . '">' . htmlspecialchars($value[$labelColumn1]) . '</option>';
+                            }
+                        }
+                        ?>
+                    </select>
+                        
+                <!-- Domyślne pole tekstowe dla pozostałych kolumn -->
+                <?php else: ?>    
                 <input type="text" id="<?php echo $column['column_name']; ?>" name="<?php echo $column['column_name']; ?>" <?php echo $column['is_nullable'] === 'NO' ? 'required' : ''; ?>>
+                <?php endif; ?>
             </div>
         <?php endforeach; ?>
         
