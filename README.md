@@ -25,7 +25,7 @@ System wspierający zarządzanie ośrodkiem szkolenia kierowców. Umożliwia rej
    - Pobierz ZIP z GitHuba lub użyj Git GUI, np. GitHub Desktop.
 
 2. **Wgraj projekt do XAMPP:**
-   - Rozpakuj folder projektu i umieść go w katalogu `htdocs`, np. `C:\xampp\htdocs\osk`.
+   - Rozpakuj folder projektu i umieść go w katalogu `htdocs`, np. `C:\xampp\htdocs\external_access`.
 
 3. **Utwórz bazę danych:**
    - Uruchom pgAdmin lub inny interfejs PostgreSQL.
@@ -45,7 +45,7 @@ System wspierający zarządzanie ośrodkiem szkolenia kierowców. Umożliwia rej
    Włącz Apache i upewnij się, że PostgreSQL działa.
 
 6. **Otwórz przeglądarkę i wpisz:**
-   http://localhost/osk
+   http://localhost/external_access
 
 ## 👥 Autorzy
    - [Piotrek] (https://github.com/g0rzki) – logika aplikacji, backend, połączenia z bazą, operacje CRUD, automatyzacja powiązań
