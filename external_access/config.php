@@ -2,7 +2,7 @@
 $host = 'localhost';
 $dbname = 'osk';
 $username = 'postgres';
-$password = '12345';
+$password = 'twoje_haslo';
 
 try {
     // Łączenie z bazą danych 
