@@ -36,9 +36,8 @@ System wspierający zarządzanie ośrodkiem szkolenia kierowców. Umożliwia rej
 4. **Skonfiguruj połączenie z bazą w `config.php`:**
    ```php
    $host = 'localhost';
-   $port = '5432';
    $dbname = 'osk';
-   $user = 'postgres';
+   $username = 'postgres';
    $password = 'twoje_haslo';
 
 5. **Uruchom XAMPP:**
