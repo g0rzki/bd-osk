@@ -1,5 +1,7 @@
 # OSK - Ośrodek Szkolenia Kierowców
 
+This project was created as part of a university course and is documented in Polish.
+
 Projekt wykonany w ramach zajęć uczelnianych.
 
 System wspierający zarządzanie ośrodkiem szkolenia kierowców. Umożliwia rejestrację kursantów, przypisywanie ich do kursów oraz przeglądanie danych administracyjnych.
