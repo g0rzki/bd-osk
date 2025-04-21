@@ -52,6 +52,3 @@ System wspierający zarządzanie ośrodkiem szkolenia kierowców. Umożliwia rej
    - [Piotrek] (https://github.com/g0rzki) – logika aplikacji, backend, połączenia z bazą, operacje CRUD, automatyzacja powiązań
      
    - [Julia] (https://github.com/julchm) – analiza wymagań, modelowanie danych, projekt diagramów ERD i przypadków użycia, przygotowanie dokumentacji technicznej oraz współtworzenie struktury bazy danych
-    
-## 📜 Licencja
-   Projekt dostępny na licencji MIT – możesz go swobodnie modyfikować i rozwijać.
